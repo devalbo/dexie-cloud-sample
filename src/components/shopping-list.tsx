@@ -1,6 +1,6 @@
 import { useLiveQuery } from "dexie-react-hooks"
 import { db } from "~/data/dexie-db"
-import { ShoppingListItem } from "~/data/types"
+import { ShoppingListItem } from "~/data/common-types"
 
 
 

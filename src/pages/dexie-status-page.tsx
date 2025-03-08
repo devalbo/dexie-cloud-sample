@@ -1,6 +1,6 @@
 import { useObservable } from "dexie-react-hooks";
-import { db } from "~/data/dexie-db";
-import { DEXIE_CLOUD_DATABASE_URL } from "~/data/dexie-config";
+import { dexieDb } from "~/sync-engines/data/dexie-cloud/dexie-db";
+import { DEXIE_CLOUD_DATABASE_URL } from "~/sync-engines/data/dexie-cloud/dexie-config";
 import { DexieInvitation } from "~/components/dexie-invitation";
 import { useAppContext } from "~/app/app-layout";
 
@@ -14,7 +14,7 @@ export const DexieStatusPage = () => {
   
   const { myDexieCloudUser } = appContext; // Destructure safely
 
-  const allInvites = useObservable(db.cloud.invites)
+  const allInvites = useObservable(dexieDb.cloud.invites)
 
   console.log("DexieStatusPage: allInvites", allInvites);
   const invites = allInvites?.filter((i) => !i.accepted && !i.rejected)

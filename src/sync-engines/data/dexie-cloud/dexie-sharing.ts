@@ -1,12 +1,12 @@
 import { useLiveQuery } from "dexie-react-hooks";
-import { db } from "./dexie-db";
+import { dexieDb } from "./dexie-db";
 import { getTiedRealmId } from "dexie-cloud-addon";
-import { MyDexieCloudFriend, ShoppingList } from "./types";
+import { MyCloudFriend, ShoppingList } from "~/data/common-types";
 
 
 export const useLiveShoppingLists = (): ShoppingList[] | undefined => {
   const shoppingLists = useLiveQuery(async () => {
-    return await db.shoppingLists.toArray();
+    return await dexieDb.shoppingLists.toArray();
   })
 
   return shoppingLists;
@@ -18,15 +18,15 @@ export const useLiveShoppingList = (shoppingListId?: string): ShoppingList | und
     if (!shoppingListId) {
       return undefined;
     }
-    return await db.shoppingLists.get({ id: shoppingListId });
+    return await dexieDb.shoppingLists.get({ id: shoppingListId });
   })
 
   return shoppingList;
 }
 
 
-export const getFriendsWithAccessToShoppingList = async (shoppingListId: string): Promise<MyDexieCloudFriend[]> => {
-  const shoppingList = await db.shoppingLists.get({ id: shoppingListId });
+export const getFriendsWithAccessToShoppingList = async (shoppingListId: string): Promise<MyCloudFriend[]> => {
+  const shoppingList = await dexieDb.shoppingLists.get({ id: shoppingListId });
 
   const shoppingListRealmId = shoppingList?.realmId;
 
@@ -34,13 +34,13 @@ export const getFriendsWithAccessToShoppingList = async (shoppingListId: string)
     throw new Error("Shopping list realmId not found");
   }
 
-  const shoppingListSharedWith = await db
+  const shoppingListSharedWith = await dexieDb
     .members
     .where('realmId')
     .equals(shoppingListRealmId)
     .toArray();
 
-  const friendsWithAccess = await db
+  const friendsWithAccess = await dexieDb
     .myFriends
     .where('id')
     .anyOf(shoppingListSharedWith.map((member) => member.email ?? ''))
@@ -56,17 +56,17 @@ export const shareShoppingList = async (shoppingListId: string, friendEmails: st
 
   // Do a sync-consistent transaction that moves the space and its cards into a new realm
   // See http://dexie.org/cloud/docs/consistency
-  return db.transaction(
+  return dexieDb.transaction(
     'rw',
-    [db.shoppingLists, db.myFriends, db.realms, db.members],
+    [dexieDb.shoppingLists, dexieDb.myFriends, dexieDb.realms, dexieDb.members],
     async () => {
 
-      const shoppingList = await db.shoppingLists.get({ id: shoppingListId });
+      const shoppingList = await dexieDb.shoppingLists.get({ id: shoppingListId });
 
       console.log("FRIEND EMAILS", friendEmails);
 
       console.log("DB: shareShoppingList in transaction", shoppingListId, shoppingList);
-      const friends = await db
+      const friends = await dexieDb
         .myFriends
         .where('email')
         .anyOf(friendEmails)
@@ -82,18 +82,18 @@ export const shareShoppingList = async (shoppingListId: string, friendEmails: st
 
       // Create a realm for the shared list. Use put to not fail if it already exists.
       // (Sync consistency)
-      db.realms.put({
+      dexieDb.realms.put({
         realmId,
         name: shoppingList.name,
         represents: `A shopping list for ${shoppingList.name}`,
       })
 
-      db.shoppingLists.update(shoppingList, { realmId });
+      dexieDb.shoppingLists.update(shoppingList, { realmId });
 
       console.log("DB: shareShoppingList - sending invite to friends", shoppingListId, friends);
 
       if (friends.length > 0) {
-        db.members.bulkAdd(
+        dexieDb.members.bulkAdd(
           friends.map((friend) => ({
             realmId,
             email: friend.email,
@@ -110,7 +110,7 @@ export const shareShoppingList = async (shoppingListId: string, friendEmails: st
 
 
 export const unshareShoppingListFromFriends = async (shoppingListId: string, friendIds: string[]) => {
-  const shoppingList = await db.shoppingLists.get({ id: shoppingListId });
+  const shoppingList = await dexieDb.shoppingLists.get({ id: shoppingListId });
 
   if (!shoppingList) {
     throw new Error("Shopping list not found");
@@ -118,9 +118,9 @@ export const unshareShoppingListFromFriends = async (shoppingListId: string, fri
 
   const realmId = shoppingList.realmId || ''
 
-  const friends = await db.myFriends.where('id').anyOf(friendIds).toArray();
+  const friends = await dexieDb.myFriends.where('id').anyOf(friendIds).toArray();
 
-  return db
+  return dexieDb
     .members
     .where('[email+realmId]')
     .anyOf(

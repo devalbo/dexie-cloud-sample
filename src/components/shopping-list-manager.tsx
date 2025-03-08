@@ -1,8 +1,8 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import { UserLogin } from "dexie-cloud-addon";
 import { ShoppingListSummary } from "./shopping-list-summary";
-import { ShoppingList } from "~/data/types";
-import { db } from "~/data/dexie-db";
+import { ShoppingList } from "~/data/common-types";
+import { dexieDb } from "~/sync-engines/data/dexie-cloud/dexie-db";
 
 
 interface ShoppingListManagerProps {
@@ -18,7 +18,7 @@ export const ShoppingListManager = ({
 }: ShoppingListManagerProps) => {
 
   const shoppingLists = useLiveQuery(() => {
-    return db.shoppingLists.toArray();
+    return dexieDb.shoppingLists.toArray();
   }, [activeShoppingListId]);
 
 
@@ -49,12 +49,12 @@ export const ShoppingListManager = ({
           sharedWith: [],
         }
         
-        const newShoppingListId = await db.shoppingLists.add(newShoppingList)
+        const newShoppingListId = await dexieDb.shoppingLists.add(newShoppingList)
         setActiveShoppingListId(newShoppingListId)
       }}>Add New List</button>
 
       <button onClick={async () => {
-        await db.shoppingLists.clear();
+        await dexieDb.shoppingLists.clear();
       }}>Clear All Lists</button>
     </div>
   </>

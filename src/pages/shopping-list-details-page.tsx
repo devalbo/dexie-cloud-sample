@@ -1,6 +1,6 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import { useParams } from "react-router-dom";
-import { db } from "~/data/dexie-db";
+import { dexieDb } from "~/sync-engines/data/dexie-cloud/dexie-db";
 import { ShoppingListAccessComponent } from '~/components/shopping-list-access';
 import { useState } from "react";
 
@@ -16,19 +16,10 @@ export const ShoppingListDetailsPage = () => {
       return undefined;
     }
 
-    return db.shoppingLists.get({ id: shoppingListId });
+    return dexieDb.shoppingLists.get({ id: shoppingListId });
   }, [shoppingListId]);
 
   return (
-    // <div style={{
-    //   display: 'flex',
-    //   flexDirection: 'column',
-    //   gap: '1rem',
-    //   width: '600px',
-    //   margin: '0 auto',
-    //   alignItems: 'center',
-    //   justifyContent: 'center',
-    // }}>
     <>
       <h1>{shoppingList?.name}</h1>
       <div>

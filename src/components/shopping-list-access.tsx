@@ -1,8 +1,8 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useEffect, useState } from 'react';
-import { db } from '~/data/dexie-db';
-import { getFriendsWithAccessToShoppingList, shareShoppingList, unshareShoppingListFromFriends } from '~/data/dexie-sharing';
-import { MyDexieCloudFriend } from '~/data/types';
+import { dexieDb } from '~/sync-engines/data/dexie-cloud/dexie-db';
+import { getFriendsWithAccessToShoppingList, shareShoppingList, unshareShoppingListFromFriends } from '~/sync-engines/data/dexie-cloud/dexie-sharing';
+import { MyCloudFriend } from '~/data/common-types';
 
 
 interface ShoppingListAccessComponentProps {  
@@ -10,11 +10,11 @@ interface ShoppingListAccessComponentProps {
 }
 
 export const ShoppingListAccessComponent = ({ shoppingListId }: ShoppingListAccessComponentProps) => {
-  const allMyFriends = useLiveQuery(() => db.myFriends.toArray()) ?? [];
+  const allMyFriends = useLiveQuery(() => dexieDb.myFriends.toArray()) ?? [];
   
-  const [friendsWithAccess, setFriendsWithAccess] = useState<MyDexieCloudFriend[]>([]);
+  const [friendsWithAccess, setFriendsWithAccess] = useState<MyCloudFriend[]>([]);
 
-  const shoppingList = useLiveQuery(() => db.shoppingLists.get({id: shoppingListId}));
+  const shoppingList = useLiveQuery(() => dexieDb.shoppingLists.get({id: shoppingListId}));
 
   useEffect(() => {
     getFriendsWithAccessToShoppingList(shoppingListId)

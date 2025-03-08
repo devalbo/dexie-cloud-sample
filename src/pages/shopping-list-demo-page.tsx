@@ -1,5 +1,5 @@
 import { useLiveQuery } from "dexie-react-hooks"
-import { db } from "../data/dexie-db"
+import { dexieDb } from "../sync-engines/data/dexie-cloud/dexie-db"
 import { useEffect, useState } from "react";
 import { ShoppingListManager } from "../components/shopping-list-manager";
 import { useAppContext } from "~/app/app-layout";
@@ -14,7 +14,7 @@ export const ShoppingListDemoPage = () => {
   const shoppingLists =
     useLiveQuery(() => {
       try {
-        return db.shoppingLists.toArray();
+        return dexieDb.shoppingLists.toArray();
       } catch (e) {
         console.error("Error querying shopping lists:", e);
       }
@@ -44,16 +44,6 @@ export const ShoppingListDemoPage = () => {
   
   
   return (
-    // <div style={{ 
-    //   display: "flex",
-    //   flexDirection: "column",
-    //   alignItems: "center",
-    //   justifyContent: "center",
-    //   textAlign: "center",
-    //   width: "100%",
-    //   maxWidth: 600,
-    //   padding: 20,
-    // }}>
     <>
       <h1>Cloud Shopping List Demo</h1>
 
