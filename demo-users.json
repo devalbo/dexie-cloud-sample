@@ -1,0 +1,7 @@
+{
+  "demoUsers": {
+    "alice@demo.local": {},
+    "bob@demo.local": {},
+    "charlie@demo.local": {}
+  }
+}
