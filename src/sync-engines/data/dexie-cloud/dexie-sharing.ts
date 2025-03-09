@@ -182,5 +182,14 @@ export const addShoppingListItem = async (
   }
 
   await dexieDb.shoppingListItems.add(newItem);
+}
 
+
+export const deleteShoppingList = async (idToDelete: string) => {
+  await dexieDb.shoppingLists.delete(idToDelete as any);
+}
+
+
+export const deleteShoppingListItem = async (itemId: string) => {
+  await dexieDb.shoppingListItems.delete(itemId as any);
 }

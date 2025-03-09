@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
-import { dexieDb } from '~/sync-engines/data/dexie-cloud/dexie-db';
 import { ShoppingList } from '~/data/common-types';
-import { renameShoppingList } from '~/sync-engines/data/dexie-cloud/dexie-sharing';
+import { deleteShoppingList, renameShoppingList } from '~/sync-engines/data/dexie-cloud/dexie-sharing';
 
 interface ShoppingListSummaryProps {
   list: ShoppingList;
@@ -45,14 +44,13 @@ export const ShoppingListSummary = ({ list }: ShoppingListSummaryProps) => {
         <Link to={`/lists/${list.id}/share`} style={{ textDecoration: 'none' }}>
           <button>Share</button>
         </Link>
-        <button onClick={ async () => {
-          const idToDelete = list.id;
-          if (!idToDelete) {
-            return;
-          }
+        <button onClick={async () => {
           const areYouSure = confirm("Are you sure you want to delete this list?");
           if (areYouSure) {
-            await dexieDb.shoppingLists.delete(idToDelete as any);
+            if (!list.id) {
+              return;
+            }
+            await deleteShoppingList(list.id);
           }
         }}>Delete</button>
       </div>
