@@ -1,3 +1,4 @@
+import { UserLogin } from "dexie-cloud-addon"
 
 export interface MyCloudFriend {
   id?: string
@@ -21,4 +22,57 @@ export interface ShoppingListItem {
   price: number
   addedBy: string
   shoppingListId: string
+}
+
+export interface CloudUser {
+  id?: string
+  email?: string
+  isLoggedIn: boolean
+}
+
+
+export type NoAuthUser = CloudUser
+
+export type CloudSyncEngine = 'dexie-cloud' | 'tinybase' | null
+
+
+
+// export type SyncEngineContext = {
+//   activeCloudSyncEngine: CloudSyncEngine
+
+//   dexieCloud: AppContextType<'dexie-cloud', UserLogin> | null
+//   tinybase: AppContextType<'tinybase', NoAuthUser> | null
+// }
+
+
+
+// Define the context type
+export type AppSyncEngineContextType<T> = {
+  syncEngine: CloudSyncEngine
+  cloudUser: CloudUser | null;
+  syncEngineCloudUser: T | null;
+  setSyncEngineCloudUser: (user: T | null) => void;
+}
+
+
+// export type AppContextType<CloudSyncEngine, T> = {
+//   syncEngine: CloudSyncEngine
+//   cloudUser: CloudUser | null;
+  
+//   syncEngineCloudUser: T | null;
+//   setSyncEngineCloudUser: (user: T | null) => void;
+// }
+
+
+export type AllSyncEnginesContext = {
+  activeCloudSyncEngine: CloudSyncEngine
+
+  dexieCloud: AppSyncEngineContextType<UserLogin> | null
+  tinybase: AppSyncEngineContextType<NoAuthUser> | null
+}
+
+
+export type AppUserSyncContextType = {
+  activeCloudSyncEngine: CloudSyncEngine
+  cloudUser: CloudUser | null;
 }

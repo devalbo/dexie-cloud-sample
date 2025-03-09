@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom";
-import { UserLogin } from "dexie-cloud-addon";
+import { CloudUser } from "~/data/common-types";
 
 
-export const AppHeader = ({ myDexieCloudUser }: { myDexieCloudUser: UserLogin | null }) => {
+export const AppHeader = ({ cloudUser }: { cloudUser: CloudUser | null }) => {
 
 
   const DexieStatusComponent = () => {
-    if (!myDexieCloudUser) {
+    if (!cloudUser) {
       return (
         <div>
           <Link to="/dexie-status">Dexie Login Required</Link>
@@ -14,7 +14,7 @@ export const AppHeader = ({ myDexieCloudUser }: { myDexieCloudUser: UserLogin | 
       );
     }
 
-    const dexieStatusTitle = `Dexie Status - ${myDexieCloudUser.email}`;
+    const dexieStatusTitle = `Dexie Status - ${cloudUser.email}`;
 
     return (
       <div>

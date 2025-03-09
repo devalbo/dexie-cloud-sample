@@ -2,17 +2,18 @@ import { useObservable } from "dexie-react-hooks";
 import { dexieDb } from "~/sync-engines/data/dexie-cloud/dexie-db";
 import { DEXIE_CLOUD_DATABASE_URL } from "~/sync-engines/data/dexie-cloud/dexie-config";
 import { DexieInvitation } from "~/components/dexie-invitation";
-import { useAppContext } from "~/app/app-layout";
+import { useDexieCloudAppContext } from "~/sync-engines/components/dexie-cloud/dexie-cloud-app-context";
 
 
 export const DexieStatusPage = () => {
 
-  const appContext = useAppContext(); // Get the context
+  const appContext = useDexieCloudAppContext(); // Get the context
   if (!appContext) {
     throw new Error("useAppContext must be used within an AppContext.Provider");
   }
   
-  const { myDexieCloudUser } = appContext; // Destructure safely
+  const { syncEngineCloudUser } = appContext; // Destructure safely
+  const myDexieCloudUser = syncEngineCloudUser;
 
   const allInvites = useObservable(dexieDb.cloud.invites)
 

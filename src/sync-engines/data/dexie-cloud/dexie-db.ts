@@ -15,7 +15,7 @@ dexieDb.version(3).stores({
 
 dexieDb.cloud.configure({
   databaseUrl: DEXIE_CLOUD_DATABASE_URL,
-  requireAuth: true,
+  requireAuth: false,
   customLoginGui: false,
   tryUseServiceWorker: true,
   periodicSync: {

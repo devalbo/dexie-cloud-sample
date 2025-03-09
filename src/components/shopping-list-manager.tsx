@@ -6,13 +6,13 @@ import { dexieDb } from "~/sync-engines/data/dexie-cloud/dexie-db";
 
 
 interface ShoppingListManagerProps {
-  myDexieCloudUser: UserLogin
+  cloudUser: UserLogin
   activeShoppingListId: string | null
   setActiveShoppingListId: (id: string | null) => void
 }
 
 export const ShoppingListManager = ({
-  myDexieCloudUser, 
+  cloudUser,
   activeShoppingListId,
   setActiveShoppingListId
 }: ShoppingListManagerProps) => {
@@ -43,7 +43,7 @@ export const ShoppingListManager = ({
         
         const newShoppingList = {
           name: newShoppingListName,
-          author: myDexieCloudUser.email || "",
+          author: cloudUser.email || "",
           isActive: true,
           createdAt: new Date(),
           sharedWith: [],

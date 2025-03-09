@@ -1,19 +1,18 @@
-import { useAppContext } from "~/app/app-layout";
 import { MyDexieCloudZone } from "~/components/cloud-zone"
+import { useDexieCloudAppContext } from "~/sync-engines/components/dexie-cloud/dexie-cloud-app-context";
 
 
 export const CloudZonePage = () => {
-  const appContext = useAppContext(); // Get the context
+  const appContext = useDexieCloudAppContext(); // Get the context
   if (!appContext) {
     throw new Error("useAppContext must be used within an AppContext.Provider");
   }
   
-  const { myDexieCloudUser, setMyDexieCloudUser } = appContext; // Destructure safely
+  const { syncEngineCloudUser } = appContext; // Destructure safely
 
   return (
     <MyDexieCloudZone 
-      myDexieCloudUser={myDexieCloudUser}
-      setMyDexieCloudUser={setMyDexieCloudUser}
+      myDexieCloudUser={syncEngineCloudUser}
     />
   )
 }

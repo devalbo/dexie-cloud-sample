@@ -17,10 +17,12 @@ const addFriend = async () => {
 
 const handleEmailLogin = async () => {
   await dexieDb.cloud.login();
+  console.log("User logged in", dexieDb.cloud.currentUser.value);
 }
 
 const handleLogout = async () => {
   await dexieDb.cloud.logout();
+  console.log("User logged out", dexieDb.cloud.currentUser.value);
 }
 
 
@@ -44,6 +46,8 @@ export const MyDexieCloudUser = ({
       </div>
     );
   }
+
+
   return (
     <div>
       My Dexie Cloud Email: {myDexieCloudUser.email}
@@ -83,12 +87,13 @@ export const MyDexieCloudZone = ({ myDexieCloudUser }: MyDexieCloudZoneProps) =>
 
   
   return (
-    <div style={{
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
-    }}>
+    // <div style={{
+    //   display: "flex",
+    //   flexDirection: "column",
+    //   alignItems: "center",
+    //   justifyContent: "center",
+    // }}>
+    <>
       <MyDexieCloudUser 
         myDexieCloudUser={myDexieCloudUser}
         toggleHelp={toggleHelp}
@@ -140,6 +145,6 @@ export const MyDexieCloudZone = ({ myDexieCloudUser }: MyDexieCloudZoneProps) =>
           </div>
         )
       }
-    </div>
+    </>
   )
 }
