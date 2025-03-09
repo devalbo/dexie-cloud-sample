@@ -23,7 +23,13 @@ export const ShoppingListManager = ({
 
 
   return (
-    <>
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '10px',
+      width: '100%',
+      alignItems: 'center',
+    }}>
     <div>
       {
         shoppingLists?.map((list: ShoppingList) => (
@@ -55,8 +61,8 @@ export const ShoppingListManager = ({
 
       <button onClick={async () => {
         await dexieDb.shoppingLists.clear();
-      }}>Clear All Lists</button>
+        }}>Clear All Lists</button>
+      </div>
     </div>
-  </>
-   )
+  )
 }

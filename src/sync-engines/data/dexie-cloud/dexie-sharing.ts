@@ -1,7 +1,7 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import { dexieDb } from "./dexie-db";
 import { getTiedRealmId } from "dexie-cloud-addon";
-import { MyCloudFriend, ShoppingList } from "~/data/common-types";
+import { MyCloudFriend, ShoppingList, ShoppingListItem } from "~/data/common-types";
 
 
 export const useLiveShoppingLists = (): ShoppingList[] | undefined => {
@@ -19,9 +19,27 @@ export const useLiveShoppingList = (shoppingListId?: string): ShoppingList | und
       return undefined;
     }
     return await dexieDb.shoppingLists.get({ id: shoppingListId });
-  })
+  }, [shoppingListId])
 
   return shoppingList;
+}
+
+
+export const useLiveShoppingListItems = (shoppingListId?: string): ShoppingListItem[] | undefined => {
+  // const shoppingList = useLiveShoppingList(shoppingListId);
+
+  const shoppingListItems = useLiveQuery(async () => {
+    if (!shoppingListId) {
+      return [];
+    }
+    return await dexieDb
+      .shoppingListItems
+      .where('shoppingListId')
+      .equals(shoppingListId)
+      .toArray();
+  }, [shoppingListId])
+
+  return shoppingListItems;
 }
 
 
@@ -131,3 +149,38 @@ export const unshareShoppingListFromFriends = async (shoppingListId: string, fri
     .delete()
 }
 
+
+export const renameShoppingList = async (shoppingListId: string, newName: string) => {
+  const shoppingList = await dexieDb.shoppingLists.get({ id: shoppingListId });
+
+  if (!shoppingList) {
+    throw new Error("Shopping list not found");
+  }
+
+  dexieDb.shoppingLists.update(shoppingList, { name: newName });
+}
+
+
+export const addShoppingListItem = async (
+  shoppingListId: string,
+  itemName: string,
+  itemPrice: number,
+  addedBy: string
+) => {
+  const shoppingList = await dexieDb.shoppingLists.get({ id: shoppingListId });
+
+  if (!shoppingList) {
+    throw new Error("Shopping list not found");
+  }
+
+  const newItem: ShoppingListItem = {
+    name: itemName,
+    price: itemPrice,
+    shoppingListId: shoppingListId,
+    addedBy: addedBy,
+    realmId: shoppingList.realmId,
+  }
+
+  await dexieDb.shoppingListItems.add(newItem);
+
+}

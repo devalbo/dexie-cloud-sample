@@ -22,6 +22,7 @@ export interface ShoppingListItem {
   price: number
   addedBy: string
   shoppingListId: string
+  realmId?: string
 }
 
 export interface CloudUser {
