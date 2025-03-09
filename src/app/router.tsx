@@ -7,6 +7,7 @@ import { DexieStatusPage } from "../pages/dexie-status-page";
 import { CloudZonePage } from "../pages/cloud-zone-page";
 import { ShoppingListSharingPage } from "../pages/shopping-list-sharing-page";
 import { SyncEngineProvider } from "./sync-engine-provider";
+import { NotificationsPage } from "~/pages/notifications-page";
 
 
 export const router = createBrowserRouter([
@@ -38,6 +39,10 @@ export const router = createBrowserRouter([
       {
         path: "cloud-zone",
         element: <CloudZonePage />,
+      },
+      {
+        path: "notifications",
+        element: <NotificationsPage />,
       },
     ],
   },

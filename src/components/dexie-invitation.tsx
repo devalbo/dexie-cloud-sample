@@ -7,7 +7,7 @@ interface DexieInvitationProps {
 
 export const DexieInvitation = ({ invitation }: DexieInvitationProps) => {
 
-  const { invitedBy, realmId, realm } = invitation;
+  const { invitedBy, realm } = invitation;
 
   if (!invitedBy) {
     return (
@@ -17,12 +17,12 @@ export const DexieInvitation = ({ invitation }: DexieInvitationProps) => {
     )
   }
 
-  const { email, name, userId } = invitedBy;
+  const { name } = invitedBy;
 
   return (
     <>
       <p>
-        {email} | {name} | {userId} | {realmId} 
+        {name}
         <br />
         {realm?.name}
       </p>

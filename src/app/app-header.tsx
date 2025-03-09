@@ -4,7 +4,6 @@ import { CloudUser } from "~/data/common-types";
 
 export const AppHeader = ({ cloudUser }: { cloudUser: CloudUser | null }) => {
 
-
   const DexieStatusComponent = () => {
     if (!cloudUser) {
       return (
@@ -23,6 +22,18 @@ export const AppHeader = ({ cloudUser }: { cloudUser: CloudUser | null }) => {
     );
   }
 
+  const getNotificationsTitle = () => {
+    if (!cloudUser) {
+      return 'Notifications';
+    }
+
+    return cloudUser.notifications.length > 0 ? 
+      `Notifications (${cloudUser.notifications.length})` :
+      'Notifications';
+  }
+
+  const notificationsTitle = getNotificationsTitle();
+
 
   return (
     <div style={{
@@ -34,6 +45,7 @@ export const AppHeader = ({ cloudUser }: { cloudUser: CloudUser | null }) => {
       }}>
         <Link to="/">Home</Link>
         <Link to="/cloud-zone">Cloud Zone</Link>
+        <Link to="/notifications">{notificationsTitle}</Link>
         <div style={{ marginLeft: 'auto' }}>
           <DexieStatusComponent />
         </div>

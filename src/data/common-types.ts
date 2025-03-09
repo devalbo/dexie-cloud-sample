@@ -25,10 +25,19 @@ export interface ShoppingListItem {
   realmId?: string
 }
 
+export interface CloudNotification {
+  id?: string
+  message: string
+  from: string
+  to: string
+  createdAt: Date
+}
+
 export interface CloudUser {
   id?: string
   email?: string
   isLoggedIn: boolean
+  notifications: CloudNotification[]
 }
 
 

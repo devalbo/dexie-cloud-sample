@@ -30,38 +30,42 @@ export const ShoppingListManager = ({
       width: '100%',
       alignItems: 'center',
     }}>
-    <div>
-      {
-        shoppingLists?.map((list: ShoppingList) => (
-          <ShoppingListSummary key={list.id} list={list} />
-        ))
-      }
-    </div>
-    
-    <div>
-      <button onClick={async () => {
-        const newShoppingListName = prompt("Enter the name of the new shopping list:");
-        
-        if (!newShoppingListName) {
-          console.error("No name provided for new shopping list.");
-          return;
+      <div>
+        {
+          shoppingLists?.map((list: ShoppingList) => (
+            <ShoppingListSummary key={list.id} list={list} />
+          ))
         }
-        
-        const newShoppingList = {
-          name: newShoppingListName,
-          author: cloudUser.email || "",
-          isActive: true,
-          createdAt: new Date(),
-          sharedWith: [],
-        }
-        
-        const newShoppingListId = await dexieDb.shoppingLists.add(newShoppingList)
-        setActiveShoppingListId(newShoppingListId)
-      }}>Add New List</button>
+      </div>
+      
+      <div>
+        <button onClick={async () => {
+          const newShoppingListName = prompt("Enter the name of the new shopping list:");
+          
+          if (!newShoppingListName) {
+            console.error("No name provided for new shopping list.");
+            return;
+          }
+          
+          const newShoppingList = {
+            name: newShoppingListName,
+            author: cloudUser.email || "",
+            isActive: true,
+            createdAt: new Date(),
+            sharedWith: [],
+          }
+          
+          const newShoppingListId = await dexieDb.shoppingLists.add(newShoppingList)
+          setActiveShoppingListId(newShoppingListId)
+        }}>
+          Add New List
+        </button>
 
-      <button onClick={async () => {
-        await dexieDb.shoppingLists.clear();
-        }}>Clear All Lists</button>
+        <button onClick={async () => {
+          await dexieDb.shoppingLists.clear();
+        }}>
+          Clear All Lists
+        </button>
       </div>
     </div>
   )

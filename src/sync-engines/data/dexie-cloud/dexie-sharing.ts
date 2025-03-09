@@ -26,7 +26,6 @@ export const useLiveShoppingList = (shoppingListId?: string): ShoppingList | und
 
 
 export const useLiveShoppingListItems = (shoppingListId?: string): ShoppingListItem[] | undefined => {
-  // const shoppingList = useLiveShoppingList(shoppingListId);
 
   const shoppingListItems = useLiveQuery(async () => {
     if (!shoppingListId) {
@@ -43,26 +42,41 @@ export const useLiveShoppingListItems = (shoppingListId?: string): ShoppingListI
 }
 
 
-export const getFriendsWithAccessToShoppingList = async (shoppingListId: string): Promise<MyCloudFriend[]> => {
-  const shoppingList = await dexieDb.shoppingLists.get({ id: shoppingListId });
+export const useLiveFriendsWithAccessToShoppingList = (shoppingListId: string): MyCloudFriend[] | undefined => {
 
-  const shoppingListRealmId = shoppingList?.realmId;
+  const friendsWithAccess = useLiveQuery(async () => {
+    const shoppingList = await dexieDb.shoppingLists.get({ id: shoppingListId });
 
-  if (!shoppingListRealmId) {
-    throw new Error("Shopping list realmId not found");
-  }
+    const shoppingListRealmId = shoppingList?.realmId;
 
-  const shoppingListSharedWith = await dexieDb
-    .members
-    .where('realmId')
-    .equals(shoppingListRealmId)
-    .toArray();
+    if (!shoppingListRealmId) {
+      throw new Error("Shopping list realmId not found");
+    }
 
-  const friendsWithAccess = await dexieDb
-    .myFriends
-    .where('id')
-    .anyOf(shoppingListSharedWith.map((member) => member.email ?? ''))
-    .toArray();
+    const shoppingListSharedWithMembers = await dexieDb
+      .members
+      .where('realmId')
+      .equals(shoppingListRealmId)
+      .toArray();
+
+    const shoppingListSharedWithEmails = shoppingListSharedWithMembers
+      .filter((member) => member.email)
+      .map((member) => member.email!);
+
+    const allFriends = await dexieDb.myFriends.toArray();
+
+    console.log("SHOPPING LIST REALM ID", shoppingListRealmId);
+    console.log("SHOPPING LIST SHARED WITH", shoppingListSharedWithEmails);
+    console.log("ALL FRIENDS", allFriends);
+
+    const friendsWithAccess = await dexieDb
+      .myFriends
+      .where('email')
+      .anyOf(shoppingListSharedWithEmails)
+      .toArray();
+
+    return friendsWithAccess;
+  })
 
   return friendsWithAccess;
 }
@@ -127,26 +141,45 @@ export const shareShoppingList = async (shoppingListId: string, friendEmails: st
 }
 
 
-export const unshareShoppingListFromFriends = async (shoppingListId: string, friendIds: string[]) => {
+export const unshareShoppingListFromFriends = async (shoppingListId: string, friendEmails: string[]) => {
   const shoppingList = await dexieDb.shoppingLists.get({ id: shoppingListId });
 
   if (!shoppingList) {
     throw new Error("Shopping list not found");
   }
 
-  const realmId = shoppingList.realmId || ''
+  const realmId = shoppingList.realmId;
 
-  const friends = await dexieDb.myFriends.where('id').anyOf(friendIds).toArray();
+  const allFriends = await dexieDb
+    .myFriends
+    .where('email')
+    .anyOf(friendEmails)
+    .toArray()
 
-  return dexieDb
+  const allFriendsEmails = allFriends.map((friend) => friend.email!);
+
+  const toDelete = await dexieDb
     .members
     .where('[email+realmId]')
     .anyOf(
-      friends.map(
-        (friend) => [friend.email ?? '', realmId] as [string, string],
+      allFriendsEmails.map(
+        (friendEmail) => [friendEmail, realmId] as [string, string],
+      ),
+    )
+
+  console.log("TO DELETE", toDelete);
+
+  const deletedMembers = await dexieDb
+    .members
+    .where('[email+realmId]')
+    .anyOf(
+      allFriendsEmails.map(
+        (friendEmail) => [friendEmail, realmId] as [string, string],
       ),
     )
     .delete()
+
+  return deletedMembers;
 }
 
 

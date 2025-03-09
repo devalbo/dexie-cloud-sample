@@ -1,6 +1,6 @@
 # cloud-optional-starter
 
-I created this repo to better understand local-first dev and cloud syncing with different engines using a React frontend. Since I am mostly interested in multiplayer scenarios (and they're complex code samples to reproduce), I'm setting up these examples to help with reproducibility. Maybe it'll be helpful to others.
+I created this repo to better understand local-first dev and cloud syncing across different engines using a React frontend. I'm wondering if there will be any common layers of abstraction (e.g. user IDs, emails, invitations/notifications, how data is structured for sharing) that might emerge. Since I am mostly interested in multiplayer scenarios (and they're complex code samples to reproduce), I'm setting up these examples to help with reproducibility. Maybe it'll be helpful to others.
 
 I'm really trying to figure out how to get multiplayer security for the best value. Engines I've been messing with along with some notes for my future reference...
 

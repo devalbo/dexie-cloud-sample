@@ -1,7 +1,4 @@
-import { useObservable } from "dexie-react-hooks";
-import { dexieDb } from "~/sync-engines/data/dexie-cloud/dexie-db";
 import { DEXIE_CLOUD_DATABASE_URL } from "~/sync-engines/data/dexie-cloud/dexie-config";
-import { DexieInvitation } from "~/components/dexie-invitation";
 import { useDexieCloudAppContext } from "~/sync-engines/components/dexie-cloud/dexie-cloud-app-context";
 
 
@@ -15,10 +12,10 @@ export const DexieStatusPage = () => {
   const { syncEngineCloudUser } = appContext; // Destructure safely
   const myDexieCloudUser = syncEngineCloudUser;
 
-  const allInvites = useObservable(dexieDb.cloud.invites)
+  // const allInvites = useObservable(dexieDb.cloud.invites)
 
-  console.log("DexieStatusPage: allInvites", allInvites);
-  const invites = allInvites?.filter((i) => !i.accepted && !i.rejected)
+  // console.log("DexieStatusPage: allInvites", allInvites);
+  // const invites = allInvites?.filter((i) => !i.accepted && !i.rejected)
 
   
   return (
@@ -37,10 +34,10 @@ export const DexieStatusPage = () => {
         <div>
           Sync User ID: {myDexieCloudUser?.userId}
         </div>
-        <div>
+        {/* <div>
           Invites from:
           {invites?.map((i) => <DexieInvitation invitation={i} />)}
-        </div>
+        </div> */}
         <div>
           Dexie Cloud URL: {DEXIE_CLOUD_DATABASE_URL}
         </div>
