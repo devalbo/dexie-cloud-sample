@@ -1,8 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks';
-import { useEffect, useState } from 'react';
-import { db } from '~/data/dexie-db';
-import { getFriendsWithAccessToShoppingList, shareShoppingList, unshareShoppingListFromFriends } from '~/data/dexie-sharing';
-import { MyDexieCloudFriend } from '~/data/types';
+import { dexieDb } from '~/sync-engines/data/dexie-cloud/dexie-db';
+import { shareShoppingList, unshareShoppingListFromFriends, useLiveFriendsWithAccessToShoppingList } from '~/sync-engines/data/dexie-cloud/dexie-sharing';
 
 
 interface ShoppingListAccessComponentProps {  
@@ -10,20 +8,13 @@ interface ShoppingListAccessComponentProps {
 }
 
 export const ShoppingListAccessComponent = ({ shoppingListId }: ShoppingListAccessComponentProps) => {
-  const allMyFriends = useLiveQuery(() => db.myFriends.toArray()) ?? [];
-  
-  const [friendsWithAccess, setFriendsWithAccess] = useState<MyDexieCloudFriend[]>([]);
 
-  const shoppingList = useLiveQuery(() => db.shoppingLists.get({id: shoppingListId}));
+  const allMyFriends = useLiveQuery(() => dexieDb.myFriends.toArray()) ?? [];
+  const shoppingList = useLiveQuery(() => dexieDb.shoppingLists.get({id: shoppingListId}));
 
-  useEffect(() => {
-    getFriendsWithAccessToShoppingList(shoppingListId)
-      .then((friends) => {
-        console.log(friends);
-        setFriendsWithAccess(friends);
-      });
-  }, [shoppingListId]);
-  
+  const friendsWithAccess = useLiveFriendsWithAccessToShoppingList(shoppingListId);
+  const friendsWithAccessEmails = friendsWithAccess?.map((friend) => friend.email!) ?? [];
+
 
   const doShare = async (friendEmail: string) => {
     await shareShoppingList(shoppingListId, [friendEmail]);
@@ -45,7 +36,7 @@ export const ShoppingListAccessComponent = ({ shoppingListId }: ShoppingListAcce
             <label>
               <input
                 type="radio"
-                checked={friendsWithAccess.includes(friend)}
+                checked={friendsWithAccessEmails.includes(friend.email!)}
                 onChange={() => doShare(friend.email)}
               />
               Shared
@@ -53,7 +44,7 @@ export const ShoppingListAccessComponent = ({ shoppingListId }: ShoppingListAcce
             <label>
               <input
                 type="radio"
-                checked={!friendsWithAccess.includes(friend)}
+                checked={!friendsWithAccessEmails.includes(friend.email!)}
                 onChange={() => doUnshare(friend.email)}
               />
               Not Shared
@@ -63,4 +54,4 @@ export const ShoppingListAccessComponent = ({ shoppingListId }: ShoppingListAcce
       </div>
     </div>
   );
-}; 
+};

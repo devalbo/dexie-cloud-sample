@@ -1,64 +1,48 @@
-import { useLiveQuery } from "dexie-react-hooks";
 import { useParams } from "react-router-dom";
-import { db } from "~/data/dexie-db";
-import { ShoppingListAccessComponent } from '~/components/shopping-list-access';
-import { useState } from "react";
+import { addShoppingListItem, useLiveShoppingList, useLiveShoppingListItems } from "~/sync-engines/data/dexie-cloud/dexie-sharing";
+import { ShoppingListItemComponent } from "~/components/shopping-list-item";
+import { useAppUserSyncContext } from "~/app/app-user-sync-context";
 
 
 export const ShoppingListDetailsPage = () => {
   const { shoppingListId } = useParams();
 
-  const [view, setView] = useState<'sharing' | 'items'>('items');
+  const { cloudUser } = useAppUserSyncContext();
 
-  
-  const shoppingList = useLiveQuery(() => {
-    if (!shoppingListId) {
-      return undefined;
+  const shoppingList = useLiveShoppingList(shoppingListId);
+  const shoppingListItems = useLiveShoppingListItems(shoppingListId);
+
+  const doAddItem = async () => {
+    const itemName = prompt("Enter the name of the item");
+    if (!itemName) {
+      return;
     }
 
-    return db.shoppingLists.get({ id: shoppingListId });
-  }, [shoppingListId]);
+    const addedBy = cloudUser?.email ?? "";
+
+    await addShoppingListItem(shoppingListId!, itemName, 10, addedBy);
+  }
+
 
   return (
-    // <div style={{
-    //   display: 'flex',
-    //   flexDirection: 'column',
-    //   gap: '1rem',
-    //   width: '600px',
-    //   margin: '0 auto',
-    //   alignItems: 'center',
-    //   justifyContent: 'center',
-    // }}>
-    <>
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '10px',
+      width: '400px',
+    }}>
       <h1>{shoppingList?.name}</h1>
-      <div>
-        <label>
-          <input 
-            type="radio" 
-            name="view" 
-            value="items" 
-            checked={view === 'items'}
-            onChange={() => setView('items')}
-          />
-          Items
-        </label>
-        <label>
-          <input 
-            type="radio" 
-            name="view" 
-            value="sharing" 
-            checked={view === 'sharing'}
-            onChange={() => setView('sharing')}
-          />
-          Sharing
-        </label>
-      </div>
-      {view === 'sharing' && (
-        <ShoppingListAccessComponent
-          shoppingListId={shoppingListId!}
-        />
-      )}
-      {view === 'items' && <div style={{ textAlign: 'center' }}>Items</div>}
-    </>
+      {
+        shoppingListItems && shoppingListItems.length > 0 ? (
+          shoppingListItems.map((item) => (
+            <ShoppingListItemComponent key={item.id} item={item} />
+          ))
+        ) : (
+          <div>No items</div>
+        )
+      }
+
+      <button onClick={doAddItem}>Add Item</button>
+    </div>
   );
 };

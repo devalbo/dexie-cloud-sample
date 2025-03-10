@@ -1,12 +1,11 @@
 import { Link } from "react-router-dom";
-import { UserLogin } from "dexie-cloud-addon";
+import { CloudUser } from "~/data/common-types";
 
 
-export const AppHeader = ({ myDexieCloudUser }: { myDexieCloudUser: UserLogin | null }) => {
-
+export const AppHeader = ({ cloudUser }: { cloudUser: CloudUser | null }) => {
 
   const DexieStatusComponent = () => {
-    if (!myDexieCloudUser) {
+    if (!cloudUser) {
       return (
         <div>
           <Link to="/dexie-status">Dexie Login Required</Link>
@@ -14,7 +13,7 @@ export const AppHeader = ({ myDexieCloudUser }: { myDexieCloudUser: UserLogin | 
       );
     }
 
-    const dexieStatusTitle = `Dexie Status - ${myDexieCloudUser.email}`;
+    const dexieStatusTitle = `Dexie Status - ${cloudUser.email}`;
 
     return (
       <div>
@@ -22,6 +21,18 @@ export const AppHeader = ({ myDexieCloudUser }: { myDexieCloudUser: UserLogin | 
       </div>
     );
   }
+
+  const getNotificationsTitle = () => {
+    if (!cloudUser) {
+      return 'Notifications';
+    }
+
+    return cloudUser.notifications.length > 0 ? 
+      `Notifications (${cloudUser.notifications.length})` :
+      'Notifications';
+  }
+
+  const notificationsTitle = getNotificationsTitle();
 
 
   return (
@@ -34,6 +45,7 @@ export const AppHeader = ({ myDexieCloudUser }: { myDexieCloudUser: UserLogin | 
       }}>
         <Link to="/">Home</Link>
         <Link to="/cloud-zone">Cloud Zone</Link>
+        <Link to="/notifications">{notificationsTitle}</Link>
         <div style={{ marginLeft: 'auto' }}>
           <DexieStatusComponent />
         </div>

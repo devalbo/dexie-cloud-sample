@@ -1,8 +1,8 @@
 import { useLiveQuery } from "dexie-react-hooks"
-import { db } from "../data/dexie-db"
+import { dexieDb } from "../sync-engines/data/dexie-cloud/dexie-db"
 import { useEffect, useState } from "react";
 import { ShoppingListManager } from "../components/shopping-list-manager";
-import { useAppContext } from "~/app/app-layout";
+import { useDexieCloudAppContext } from "~/sync-engines/components/dexie-cloud/dexie-cloud-app-context";
 
 
 // Main App component with shopping list functionality
@@ -14,7 +14,7 @@ export const ShoppingListDemoPage = () => {
   const shoppingLists =
     useLiveQuery(() => {
       try {
-        return db.shoppingLists.toArray();
+        return dexieDb.shoppingLists.toArray();
       } catch (e) {
         console.error("Error querying shopping lists:", e);
       }
@@ -27,14 +27,15 @@ export const ShoppingListDemoPage = () => {
     }
   }, [shoppingLists]);
 
-  const appContext = useAppContext(); // Get the context
+  // const appContext = useAppSyncUserContext(); // Get the context
+  const appContext = useDexieCloudAppContext(); // Get the context
   if (!appContext) {
     throw new Error("useAppContext must be used within an AppContext.Provider");
   }
   
-  const { myDexieCloudUser } = appContext; // Destructure safely
+  const { syncEngineCloudUser } = appContext; // Destructure safely
 
-  if (!myDexieCloudUser) {
+  if (!syncEngineCloudUser) {
     return (
       <div>
         Please login to Dexie Cloud to use the shopping list.
@@ -44,21 +45,11 @@ export const ShoppingListDemoPage = () => {
   
   
   return (
-    // <div style={{ 
-    //   display: "flex",
-    //   flexDirection: "column",
-    //   alignItems: "center",
-    //   justifyContent: "center",
-    //   textAlign: "center",
-    //   width: "100%",
-    //   maxWidth: 600,
-    //   padding: 20,
-    // }}>
     <>
       <h1>Cloud Shopping List Demo</h1>
 
       <ShoppingListManager 
-        myDexieCloudUser={myDexieCloudUser}
+        cloudUser={syncEngineCloudUser}
         activeShoppingListId={activeShoppingListId} 
         setActiveShoppingListId={setActiveShoppingListId} 
       />

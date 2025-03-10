@@ -1,26 +1,28 @@
 import { useState, useRef } from "react";
-import { db } from "../data/dexie-db";
+import { dexieDb } from "../sync-engines/data/dexie-cloud/dexie-db";
 import { UserLogin } from "dexie-cloud-addon";
 import { useLiveQuery } from "dexie-react-hooks";
-import { MyDexieCloudFriend } from "~/data/types";
+import { MyCloudFriend } from "~/data/common-types";
 
 
 // Function to add a friend
 const addFriend = async () => {
   const email = prompt("Enter friend's email:");
   if (email) {
-    const newFriend: MyDexieCloudFriend= { email}
-    await db.myFriends.put(newFriend)
+    const newFriend: MyCloudFriend = { email}
+    await dexieDb.myFriends.put(newFriend)
     console.log(`Friend added: ${email}`);
   }
 };
 
 const handleEmailLogin = async () => {
-  await db.cloud.login();
+  await dexieDb.cloud.login();
+  console.log("User logged in", dexieDb.cloud.currentUser.value);
 }
 
 const handleLogout = async () => {
-  await db.cloud.logout();
+  await dexieDb.cloud.logout();
+  console.log("User logged out", dexieDb.cloud.currentUser.value);
 }
 
 
@@ -44,6 +46,8 @@ export const MyDexieCloudUser = ({
       </div>
     );
   }
+
+
   return (
     <div>
       My Dexie Cloud Email: {myDexieCloudUser.email}
@@ -61,7 +65,7 @@ interface MyDexieCloudZoneProps {
 export const MyDexieCloudZone = ({ myDexieCloudUser }: MyDexieCloudZoneProps) => {
 
   const myFriends = useLiveQuery(() => {
-    return db.myFriends.toArray();
+    return dexieDb.myFriends.toArray();
   });
 
   const [showHelp, setShowHelp] = useState(false);
@@ -81,44 +85,15 @@ export const MyDexieCloudZone = ({ myDexieCloudUser }: MyDexieCloudZoneProps) =>
 
   const helpRef = useRef<HTMLDivElement | null>(null);
 
-  // const handleClickOutside = (event: MouseEvent) => {
-  //   if (helpRef.current && !helpRef.current.contains(event.target as Node)) {
-  //     setShowHelp(false);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   const userSubscription = db.cloud.currentUser.subscribe(async (user) => {
-  //     if (user.isLoggedIn) {
   
-  //       if (!user.email) {
-  //         console.error("User name or user id is not set");
-  //         return;
-  //       }
-  
-  //       setMyDexieCloudUser(user);
-  
-  //     } else {
-  //       setMyDexieCloudUser(null);
-  //     }
-  //   });
-
-  //   document.addEventListener("mousedown", handleClickOutside);
-
-  //   return () => {
-  //     userSubscription.unsubscribe();
-  //     document.removeEventListener("mousedown", handleClickOutside);
-  //   };
-  // }, []);
-
-
   return (
-    <div style={{
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
-    }}>
+    // <div style={{
+    //   display: "flex",
+    //   flexDirection: "column",
+    //   alignItems: "center",
+    //   justifyContent: "center",
+    // }}>
+    <>
       <MyDexieCloudUser 
         myDexieCloudUser={myDexieCloudUser}
         toggleHelp={toggleHelp}
@@ -142,7 +117,7 @@ export const MyDexieCloudZone = ({ myDexieCloudUser }: MyDexieCloudZoneProps) =>
 
           <button onClick={() => {
             if (confirm("Are you sure you want to clear your friends?")) {
-              db.myFriends.clear();
+              dexieDb.myFriends.clear();
             }
           }}>Clear Friends</button>
 
@@ -170,6 +145,6 @@ export const MyDexieCloudZone = ({ myDexieCloudUser }: MyDexieCloudZoneProps) =>
           </div>
         )
       }
-    </div>
+    </>
   )
 }
